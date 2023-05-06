@@ -1,0 +1,13 @@
+REPOSITORY                    TAG           IMAGE ID       CREATED         SIZE
+mariadb                       latest        07351e2c2af5   6 days ago      401MB
+adminer                       latest        0ff39138ee0b   2 weeks ago     250MB
+gcr.io/k8s-minikube/kicbase   v0.0.37       01c0ce65fff7   4 weeks ago     1.15GB
+ubuntu                        18.04         5d2df19066ac   4 weeks ago     63.1MB
+nginx                         latest        5d58c024174d   4 months ago    142MB
+coolf124/private              ubuntu_2004   a0ce5a295b63   5 months ago    72.8MB
+ubuntu                        20.04         a0ce5a295b63   5 months ago    72.8MB
+coolf124/hello-world          latest        feb5d9fea6a5   17 months ago   13.3kB
+coolf124/private              latest        feb5d9fea6a5   17 months ago   13.3kB
+hello-world                   latest        feb5d9fea6a5   17 months ago   13.3kB
+#docker inspect container_id - показывает информацию о конкретном экземпляре контейнера , на базе образа (images0), включая информацию runtime
+#docker inspect image_id - показывает информацию о базовом образе, на базе которого работают конкретные экземпляры контейнеров
