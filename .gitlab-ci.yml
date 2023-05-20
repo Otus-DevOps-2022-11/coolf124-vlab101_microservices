@@ -1,7 +1,7 @@
 variables:
   build_env_reddit_port : "A global variable"
   build_env_ip : ""
-image: ruby:2.4-stretch
+  DATABASE_URL: 'mongodb://mongo/user_posts'
 
 stages:
   - build
@@ -9,27 +9,21 @@ stages:
   - review
   - stage
   - production
-variables:
-  DATABASE_URL: 'mongodb://mongo/user_posts'
 
 before_script:
-- cd reddit
-- bundle install
-#- echo -e "deb http://deb.debian.org/debian jessie main\ndeb http://security.debian.org jessie/updates main" > /etc/apt/sources.list
-- echo "deb http://archive.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list
-- apt-get update && apt-get install -y docker
-- docker info
 
 build_job:
+  image: docker:stable
   stage: build
   script:
     - echo 'Building'
-    - docker build -t "reddit_$CI_ENVIRONMENT_SLUG":1.0 .
-    - docker run --name "reddit_$CI_ENVIRONMENT_SLUG" -d -p 9292 "reddit_$CI_ENVIRONMENT_SLUG":1.0
-    - $build_env_reddit_port=docker port "reddit_$CI_ENVIRONMENT_SLUG" 9292/tcp | head -1 | cut -d ':' -f 2
+    - docker build -t reddit:gitlab-$CI_COMMIT_SHORT_SHA .
+    - docker run --name reddit:gitlab-$CI_COMMIT_SHORT_SHA -d -p 9292 "reddit_$CI_ENVIRONMENT_SLUG":1.0
+    - $build_env_reddit_port=docker port reddit:gitlab-$CI_COMMIT_SHORT_SHA 9292/tcp | head -1 | cut -d ':' -f 2
     - $build_env_ip=curl ipinfo.io/ip
 
 test_unit_job:
+  image: ruby:2.4.2
   stage: test
   services:
     - mongo:latest
