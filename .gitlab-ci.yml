@@ -54,10 +54,10 @@ deploy_dev_job:
     url: http://dev.example.com
 branch review:
   stage: review
-  script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  script: echo "Deploy to $CI_ENVIRONMENT_SLUG to http://$build_env_ip:$build_env_reddit_port"
   environment:
     name: branch/$CI_COMMIT_REF_NAME
-    url: "http://$build_env_ip:$build_env_reddit_port"
+    url: http://$build_env_ip:$build_env_reddit_port
   only:
     - branches
   except:
