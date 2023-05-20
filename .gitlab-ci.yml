@@ -1,7 +1,7 @@
 variables:
   build_env_reddit_port : "A global variable"
   build_env_ip : ""
-image: ruby:2.4.10
+image: ruby:2.4-stretch
 
 stages:
   - build
