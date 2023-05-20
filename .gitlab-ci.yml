@@ -60,7 +60,7 @@ branch review:
   stage: review
   script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
   needs:
-    - job: build
+    - job: build_job
       artifacts: true
   environment:
     name: branch/$CI_COMMIT_REF_NAME
