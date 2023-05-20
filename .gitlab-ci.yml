@@ -27,8 +27,8 @@ build_job:
     - cut --help
     - head --help
     - build_env_reddit_port=$(docker port "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" 9292/tcp | head -1 | cut -d ':' -f 2)
-    - echo "build_env_ip=$build_env_ip" >> build.env
-    - echo "build_env_reddit_port=$build_env_reddit_port" >> build.env
+    - echo "env_build_env_ip=$build_env_ip" >> build.env
+    - echo "env_build_env_reddit_port=$build_env_reddit_port" >> build.env
   artifacts:
     reports:
       dotenv: build.env
@@ -58,13 +58,15 @@ deploy_dev_job:
     url: http://dev.example.com
 branch review:
   stage: review
-  script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  script: 
+    - echo "Deploy to $CI_ENVIRONMENT_SLUG"
+    - echo "http://$env_build_env_ip:$_env_build_env_reddit_port"
   needs:
     - job: build_job
       artifacts: true
   environment:
     name: branch/$CI_COMMIT_REF_NAME
-    url: "http://$build_env_ip:$build_env_reddit_port"
+    url: http://$env_build_env_ip:$_env_build_env_reddit_port
   only:
     - branches
   except:
@@ -87,4 +89,3 @@ production:
   environment:
     name: production
     url: http://example.com
-
