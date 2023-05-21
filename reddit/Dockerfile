@@ -9,6 +9,7 @@ COPY mongod.conf /etc/mongod.conf
 COPY db_config /reddit/db_config
 COPY start.sh /start.sh
 COPY simpletest.rb /reddit/simpletest.rb
+COPY Gemfile /reddit/Gemfile
 
 RUN cd /reddit && rm Gemfile.lock && bundle install
 RUN chmod 0777 /start.sh
