@@ -8,6 +8,7 @@ RUN git clone -b monolith https://github.com/express42/reddit.git
 COPY mongod.conf /etc/mongod.conf
 COPY db_config /reddit/db_config
 COPY start.sh /start.sh
+COPY simpletest.rb /reddit/simpletest.rb
 
 RUN cd /reddit && rm Gemfile.lock && bundle install
 RUN chmod 0777 /start.sh
