@@ -30,6 +30,7 @@ build_job:
     - cd ..
     - echo "env_build_env_ip=$build_env_ip" >> build.env
     - echo "env_build_env_reddit_port=$build_env_reddit_port" >> build.env
+    - echo "Finished build actions"
   artifacts:
     reports:
       dotenv: build.env
