@@ -66,7 +66,7 @@ branch review:
       artifacts: true
   environment:
     name: branch/$CI_COMMIT_REF_NAME
-    url: http://$env_build_env_ip:$_env_build_env_reddit_port
+    url: http://$env_build_env_ip:$env_build_env_reddit_port
   only:
     - branches
   except:
