@@ -22,7 +22,8 @@ build_job:
     - docker info
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - cd reddit
-    - docker build -t $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA .
+    - docker pull $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA || true  
+    - docker build  --cache-from $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA -t $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA . 
     - docker run --name "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" -d -p 9292 $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
     - apk add curl
     - build_env_ip=$(curl ipinfo.io/ip)
@@ -40,21 +41,17 @@ build_job:
       dotenv: build.env
 
 test_unit_job:
-  image: ruby:2.4.2
+  image: docker:stable
   stage: test
-  services:
-    - mongo:latest
   script:
     - echo 'Testing 1'
-    - cd reddit
-    - bundle install
-    - ruby simpletest.rb
-
+    - docker pull --cache-from $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker run --rm $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA cd reddit && ruby simpletest.rb
 test_integration_job:
   stage: test
   script:
     - echo 'Testing 2'
-
+    
 deploy_dev_job:
   stage: review
   script:
