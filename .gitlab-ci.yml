@@ -62,7 +62,7 @@ branch review:
   stage: review
   script: 
     - echo "Deploy to $CI_ENVIRONMENT_SLUG"
-    - echo "http://$env_build_env_ip:$_env_build_env_reddit_port"
+    - echo "http://$env_build_env_ip:$env_build_env_reddit_port"
   needs:
     - job: build_job
       artifacts: true
