@@ -71,7 +71,7 @@ branch review:
     - echo "Deploy to $CI_ENVIRONMENT_SLUG"
     - echo "http://$env_build_env_ip:$env_build_env_reddit_port"
     - apk add curl
-    - curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-852858068\", \"text\": \"CI Gitlab: Для ветки  загружен новый commit , посмотреть приложение: https://preview.startup.com\"}" https://api.telegram.org/bot5952209752:AAGGLizylcg8PTzAIXLsHE2OgzDiTTjLCcg/sendMessage
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-852858068\", \"text\": \"CI Gitlab: Для ветки  загружен новый commit , посмотреть приложение: https://preview.startup.com\"}" https://api.telegram.org/bot5952209752:AAGGLizylcg8PTzAIXLsHE2OgzDiTTjLCcg/sendMessage '
   needs:
     - job: build_job
       artifacts: true
