@@ -32,7 +32,6 @@ build_job:
     - cut --help
     - head --help
     - build_env_reddit_port=$(docker port "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" 9292/tcp | head -1 | cut -d ':' -f 2)
-    - echo "Pass env vars to next stage"
     - cd ..
     - echo "env_build_env_ip=$build_env_ip" >> build.env
     - echo "env_build_env_reddit_port=$build_env_reddit_port" >> build.env
@@ -51,7 +50,7 @@ test_unit_job:
     - docker info
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
-    - docker run --rm $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA /bin/sh -c "./start.sh &;cd reddit && ruby simpletest.rb"
+    - docker run --rm $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA /bin/sh -c ""./start.sh& cd reddit && ruby simpletest.rb"
 test_integration_job:
   stage: test
   script:
