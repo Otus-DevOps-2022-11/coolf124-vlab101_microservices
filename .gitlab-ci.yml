@@ -32,6 +32,7 @@ build_job:
     - cut --help
     - head --help
     - build_env_reddit_port=$(docker port "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" 9292/tcp | head -1 | cut -d ':' -f 2)
+    - echo 'Pass env vars to next stage'
     - cd ..
     - echo "env_build_env_ip=$build_env_ip" >> build.env
     - echo "env_build_env_reddit_port=$build_env_reddit_port" >> build.env
