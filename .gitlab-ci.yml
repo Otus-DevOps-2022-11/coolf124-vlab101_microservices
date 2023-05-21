@@ -1,4 +1,4 @@
-[Ovariables:
+variables:
   build_env_reddit_port : ""
   build_env_ip : "http://127.0.0.1"
   DATABASE_URL: 'mongodb://mongo/user_posts'
