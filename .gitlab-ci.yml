@@ -13,6 +13,7 @@ stages:
   - production
 
 before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 build_job:
   image: docker:stable
@@ -20,7 +21,6 @@ build_job:
   script:
     - echo 'Building'
     - docker info
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - cd reddit
     - docker pull $CI_REGISTRY_USER/reddit:latest  || true  
     - docker build  --cache-from $CI_REGISTRY_USER/reddit:latest -t $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA -t $CI_REGISTRY_USER/reddit:latest . 
@@ -46,7 +46,8 @@ test_unit_job:
   stage: test
   script:
     - echo 'Testing 1'
-    - docker run --rm $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA cd reddit && ruby simpletest.rb
+    - docker pull $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker run --rm $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA /bin/sh -c "cd reddit;ruby simpletest.rb"
 test_integration_job:
   stage: test
   script:
