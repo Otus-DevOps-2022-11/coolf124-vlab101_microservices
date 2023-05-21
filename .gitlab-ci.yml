@@ -2,7 +2,9 @@ variables:
   build_env_reddit_port : ""
   build_env_ip : "http://127.0.0.1"
   DATABASE_URL: 'mongodb://mongo/user_posts'
-
+  CI_REGISTRY_USER: 'coolf124'
+  CI_REGISTRY_PASSWORD: 'qwerty124FF!'
+  CI_REGISTRY : ""
 stages:
   - build
   - test
@@ -18,6 +20,7 @@ build_job:
   script:
     - echo 'Building'
     - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - cd reddit
     - docker build -t reddit:gitlab-$CI_COMMIT_SHORT_SHA .
     - docker run --name "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" -d -p 9292 reddit:gitlab-$CI_COMMIT_SHORT_SHA
@@ -31,6 +34,7 @@ build_job:
     - echo "env_build_env_ip=$build_env_ip" >> build.env
     - echo "env_build_env_reddit_port=$build_env_reddit_port" >> build.env
     - echo "Finished build actions"
+    - docker push reddit:gitlab-$CI_COMMIT_SHORT_SHA 
   artifacts:
     reports:
       dotenv: build.env
@@ -91,3 +95,5 @@ production:
   environment:
     name: production
     url: http://example.com
+
+
