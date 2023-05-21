@@ -23,7 +23,7 @@ build_job:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - cd reddit
     - docker pull $CI_REGISTRY_USER/reddit:latest  || true  
-    - docker build  --cache-from $CI_REGISTRY_USER/reddit:latest -t $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA . 
+    - docker build  --cache-from $CI_REGISTRY_USER/reddit:latest -t $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA -t $CI_REGISTRY_USER/reddit:latest . 
     - docker run --name "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" -d -p 9292 $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
     - apk add curl
     - build_env_ip=$(curl ipinfo.io/ip)
