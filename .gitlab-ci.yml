@@ -1,4 +1,4 @@
-variables:
+[Ovariables:
   build_env_reddit_port : ""
   build_env_ip : "http://127.0.0.1"
   DATABASE_URL: 'mongodb://mongo/user_posts'
@@ -13,8 +13,8 @@ stages:
   - production
 
 before_script:
-  
-
+  - source .env
+  - echo $TEST_VAR  
 build_job:
   image: docker:stable
   stage: build
