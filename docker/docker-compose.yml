@@ -1,0 +1,91 @@
+version: '3.3'
+services:
+  post_db:
+    image: mongo:${MONGO_VERSION}
+    ports:
+      - '27017:27017'
+    volumes:
+      - post_db:/data/db
+    networks:
+      back_net:
+        aliases:
+          - mongodb
+          - comment_db
+          - post_db
+  ui:
+    build: ./ui
+    image: ${USERNAME}/ui:${UI_VERSION}
+    ports:
+      - ${UI_PORT}:9292/tcp
+    networks:
+      - back_net
+      - front_net
+  post:
+    build: ./post-py
+    image: ${USERNAME}/post:${POST_VERSION}
+    networks:
+      - back_net
+  comment:
+    build: ./comment
+    image: ${USERNAME}/comment:${COMMENT_VERSION}
+    networks:
+      - back_net
+  prometheus:
+    build: ../monitoring/prometheus
+    image: ${USERNAME}/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - prometheus_data:/prometheus
+    command: # Передаем доп параметры в командной строке
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=1d' # Задаем время хранения метрик в 1 день
+    networks:
+      - back_net
+  
+  node-exporter:
+    image: prom/node-exporter:v0.15.2
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      - back_net
+
+  mongodb_exporter:
+    image: percona/mongodb_exporter:0.20
+    ports:
+      - '9216:9216'
+      - '17001:17001'
+    command:
+      - '--mongodb.uri=mongodb://mongodb:27017'
+    networks:
+      back_net:
+        aliases:
+          - mongodb_exporter
+  blackbox-exporter:
+    build: ../monitoring/blackbox
+    image: coolf124/blackbox:latest
+    command:
+      - '--config.file=/etc/blackboxexporter/blackbox.yml'
+    ports:
+      - '9115:9115'
+    networks:
+      back_net:
+        aliases:
+          - blackbox
+
+volumes:
+  post_db:
+  prometheus_data:
+
+networks:
+  back_net:
+  front_net:
+
