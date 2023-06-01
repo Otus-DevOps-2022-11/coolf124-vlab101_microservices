@@ -144,4 +144,16 @@ services:
       - ./post-py:/source
     command: sh -c "cp -r /source/* /app/; cd /app ; post_app.py"
     restart: always
+#ДЗ-21. Мониторинг 
+# monitoring-1
+Рзавернут docker-host в облаке скриптом. Установлен docker
+Настроен build с помощью скрипта
+Протестирован контейнер prometheus
+prometheus, node-exporter, blackbox, mondogb-exporter добавлены в docker-compose
+Настроен build через docker-compose
+В конфиг файл prometheus.yml добавлены в виде таргетов сервисы ui, comment, node-exporter, blackbox, mondogb
+Выполнены задания с *
+Добавлен контейнер с mongodb exporter, добавлены сервис mongodb в виде таргента при запуске exporter
+Добавлен контейнер с blackbox exporter, настроен конфиг файл blackbox.yml, добавлены сервисы в виде таргентов
+Создан Makefile Для работы с командами docker-compose приложения
 
