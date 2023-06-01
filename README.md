@@ -105,4 +105,43 @@ Gitlab-runner зарегистрирован с помощью  действия
   needs:
     - job: build_job
       artifacts: true
+#ДЗ-26. Сетевое взаимодействие Docker контейнеров. Docker Compose. Тестирование образов  
+# docker #docker-4
+Протестированы разные типы сетей в docker. Изучены сетевые настройки хоста iptables используемые для сетей типов bridge
+Протестировано разделение сетей контейнеров приложения 
+> docker network create back_net --subnet=10.0.2.0/24
+> docker network create front_net --subnet=10.0.1.0/24
+ docker run -d --network=front_net -p 9292:9292 --name ui <your-login>/ui:1.0
+> docker run -d --network=back_net --name comment <your-login>/comment:1.0
+> docker run -d --network=back_net --name post <your-login>/post:1.0
+> docker run -d --network=back_net --name mongo_db \
+--network-alias=post_db --network-alias=comment_db mongo:latest
+Установлен docker-compose
+Создан docker-compose из репо https://raw.githubusercontent.com/express42/otus-snippets/master/hw-17/docker-compose.yml
+Файл отредактиварован - добавлены сети front_net и back_net, alias, использование параметров окружения .env
+Задано имя проекта в .env. Имя проекта можно задать разными способами
+
+    The -p command line flag
+    The COMPOSE_PROJECT_NAME environment variable
+    The top level name: variable from the config file (or the last name: from a series of config files specified using -f)
+    The basename of the project directory containing the config file (or containing the first config file specified using -f)
+    The basename of the current directory if no config file is specified
+Выполнено  Задание со * - добавлен файл docker-compose.override.yml который при запуске контейнера повторно копирует код приложений внутрь контейнера через подклчаемый том, далее перезапускает приложение в debud с worker 2
+  version: '3.3'
+services:
+  ui:
+    volumes:
+      - ./ui:/source
+    command: sh -c "cp -r /source/* /app/; cd /app ; puma --debug -w 2" 
+    restart: always
+  comment:
+    volumes:
+      - ./comment:/source
+    command: sh -c "cp -r /source/* /app/; cd /app ; puma --debug -w 2" 
+    restart: always
+  post:
+    volumes:
+      - ./post-py:/source
+    command: sh -c "cp -r /source/* /app/; cd /app ; post_app.py"
+    restart: always
 

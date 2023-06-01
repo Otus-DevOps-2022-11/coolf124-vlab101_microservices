@@ -2,7 +2,6 @@ variables:
   build_env_reddit_port : ""
   build_env_ip : "http://127.0.0.1"
   DATABASE_URL: 'mongodb://mongo/user_posts'
-
 stages:
   - build
   - test
@@ -11,44 +10,51 @@ stages:
   - production
 
 before_script:
-
+  - source .env
+  - echo $TEST_VAR  
 build_job:
   image: docker:stable
   stage: build
   script:
     - echo 'Building'
     - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - cd reddit
-    - docker build -t reddit:gitlab-$CI_COMMIT_SHORT_SHA .
-    - docker run --name "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" -d -p 9292 reddit:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker pull $CI_REGISTRY_USER/reddit:latest  || true  
+    - docker build  --cache-from $CI_REGISTRY_USER/reddit:latest -t $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA -t $CI_REGISTRY_USER/reddit:latest . 
+    - docker run --name "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" -d -p 9292 $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
     - apk add curl
     - build_env_ip=$(curl ipinfo.io/ip)
     - echo "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA"
     - cut --help
     - head --help
+    - sleep 7
     - build_env_reddit_port=$(docker port "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" 9292/tcp | head -1 | cut -d ':' -f 2)
-    - echo "build_env_ip=$build_env_ip" >> build.env
-    - echo "build_env_reddit_port=$build_env_reddit_port" >> build.env
+    - cd ..
+    - touch build.env
+    - echo "env_build_env_ip=$build_env_ip" >> build.env
+    - echo "env_build_env_reddit_port=$build_env_reddit_port" >> build.env
+    - echo "Finished build actions"
+    - docker push $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_USER/reddit:latest 
   artifacts:
     reports:
       dotenv: build.env
 
 test_unit_job:
-  image: ruby:2.4.2
+  image: docker:stable
   stage: test
-  services:
-    - mongo:latest
   script:
     - echo 'Testing 1'
-    - cd reddit
-    - bundle install
-    - ruby simpletest.rb
-
+    - docker info
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA
+    - docker run --rm $CI_REGISTRY_USER/reddit:gitlab-$CI_COMMIT_SHORT_SHA /bin/sh -c "./start.sh& cd reddit && ruby simpletest.rb"
 test_integration_job:
   stage: test
   script:
     - echo 'Testing 2'
-
+    
 deploy_dev_job:
   stage: review
   script:
@@ -58,13 +64,17 @@ deploy_dev_job:
     url: http://dev.example.com
 branch review:
   stage: review
-  script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  script: 
+    - echo "Deploy to $CI_ENVIRONMENT_SLUG"
+    - echo "http://$env_build_env_ip:$env_build_env_reddit_port"
+    - apk add curl
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-852858068\", \"text\": \"CI Gitlab: Для ветки $CI_COMMIT_REF_NAME загружен новый commit $CI_COMMIT_SHORT_SHA, посмотреть приложение: http://$env_build_env_ip:$env_build_env_reddit_port\"}" https://api.telegram.org/bot$TOKEN_ID/sendMessage '
   needs:
     - job: build_job
       artifacts: true
   environment:
     name: branch/$CI_COMMIT_REF_NAME
-    url: "http://$build_env_ip:$build_env_reddit_port"
+    url: http://$env_build_env_ip:$env_build_env_reddit_port
   only:
     - branches
   except:
@@ -87,4 +97,6 @@ production:
   environment:
     name: production
     url: http://example.com
+
+
 
