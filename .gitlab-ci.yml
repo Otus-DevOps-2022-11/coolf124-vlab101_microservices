@@ -1,0 +1,90 @@
+variables:
+  build_env_reddit_port : ""
+  build_env_ip : "http://127.0.0.1"
+  DATABASE_URL: 'mongodb://mongo/user_posts'
+
+stages:
+  - build
+  - test
+  - review
+  - stage
+  - production
+
+before_script:
+
+build_job:
+  image: docker:stable
+  stage: build
+  script:
+    - echo 'Building'
+    - docker info
+    - cd reddit
+    - docker build -t reddit:gitlab-$CI_COMMIT_SHORT_SHA .
+    - docker run --name "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" -d -p 9292 reddit:gitlab-$CI_COMMIT_SHORT_SHA
+    - apk add curl
+    - build_env_ip=$(curl ipinfo.io/ip)
+    - echo "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA"
+    - cut --help
+    - head --help
+    - build_env_reddit_port=$(docker port "reddit_gitlab_$CI_ENVIRONMENT_SLUG_$CI_COMMIT_SHORT_SHA" 9292/tcp | head -1 | cut -d ':' -f 2)
+    - echo "build_env_ip=$build_env_ip" >> build.env
+    - echo "build_env_reddit_port=$build_env_reddit_port" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+
+test_unit_job:
+  image: ruby:2.4.2
+  stage: test
+  services:
+    - mongo:latest
+  script:
+    - echo 'Testing 1'
+    - cd reddit
+    - bundle install
+    - ruby simpletest.rb
+
+test_integration_job:
+  stage: test
+  script:
+    - echo 'Testing 2'
+
+deploy_dev_job:
+  stage: review
+  script:
+    - echo 'Deploy'
+  environment:
+    name: dev
+    url: http://dev.example.com
+branch review:
+  stage: review
+  script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  needs:
+    - job: build_job
+      artifacts: true
+  environment:
+    name: branch/$CI_COMMIT_REF_NAME
+    url: "http://$build_env_ip:$build_env_reddit_port"
+  only:
+    - branches
+  except:
+    - master
+staging:
+  stage: stage
+  when: manual
+  only:
+    - /^\d+\.\d+\.\d+/
+  script:
+    - echo 'Deploy'
+  environment:
+    name: beta
+    url: http://beta.example.com
+production:
+  stage: production
+  when: manual
+  script:
+    - echo 'Deploy'
+  environment:
+    name: production
+    url: http://example.com
+
