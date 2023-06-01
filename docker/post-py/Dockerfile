@@ -4,6 +4,7 @@ WORKDIR /app
 COPY . /app
 
 RUN pip install --upgrade pip && apk --no-cache --update add build-base && \
+    apk add gcc musl-dev && \
     pip install -r /app/requirements.txt && \
     apk del build-base
 
