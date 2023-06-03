@@ -172,3 +172,11 @@ prometheus, node-exporter, blackbox, mondogb-exporter добавлены в dock
 В .env и в docker-compose добавлена переменная окруженния 
 environment:
 - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+
+#ДЗ-27. Введение в kubernetes
+# kubernetes-1
+Написан k8s terraform для создания и настройки хостов, установки docker, k8s
+Настроен кластер k8s через kubeadm из 2 хостов -  1 мастер, 1 work
+Установлен сетевой плаг-ин Calica
+В папке kubernetes/reddit созданы тестовые манифесты приложений
+Раскатан post-deployment.yml 
