@@ -1,18 +1,27 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: post-deployment
+  name: comment
+  labels:
+    app: reddit
+    component: comment
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: post
+      app: reddit
+      component: comment
   template:
     metadata:
-      name: post
+      name: comment
       labels:
-        app: post
+        app: reddit
+        component: comment
     spec:
       containers:
-      - image: chromko/post
-        name: post
+      - image: timur8298/comment
+        name: comment
+        env:
+        - name: COMMENT_DATABASE_HOST
+          value: comment-db
