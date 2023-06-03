@@ -157,3 +157,26 @@ prometheus, node-exporter, blackbox, mondogb-exporter добавлены в dock
 Добавлен контейнер с blackbox exporter, настроен конфиг файл blackbox.yml, добавлены сервисы в виде таргентов
 Создан Makefile Для работы с командами docker-compose приложения
 
+#ДЗ-24. Логгирование в docker 
+# logging-1
+Скачано обновление приложение в директории src. Не понятно как обновился код, вроде изменений не заметил
+В Dockerfile сервиса post добавлена установка gcc и musl-dev - apk add gcc musl-dev. Без них сервис падает
+Пересобраны образы
+Использовать текущий docker-host
+С помощью docker-compose-logging.yml развернуты контейнеры EFK+ zipking
+В Kibane просмотрены логи которые появляются через Fluent-драйвер, передаются в контейнер ElasticSearch и отображаются в Kibana
+Обнаружена ошибка (опечатка) в Dockerfile Kibana - нужно добавить установку gem install elasticsearch -v 7.4.0  без этого не формируется индекс  в elasticsearch
+Сформирован индекс в Kibana. В fluentd настроен разбор неструктурированных логов для сервиса ui через конструктукцию с названием filter , подтип parser
+Далее filter переделан под grok-шаблоны - выглядит гораздо проще чем в формате регулярных выражений
+Добавлен контейнер zipkin. Настроена подсеть backend
+В .env и в docker-compose добавлена переменная окруженния 
+environment:
+- ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+
+#ДЗ-27. Введение в kubernetes
+# kubernetes-1
+Написан k8s terraform для создания и настройки хостов, установки docker, k8s
+Настроен кластер k8s через kubeadm из 2 хостов -  1 мастер, 1 work
+Установлен сетевой плаг-ин Calica
+В папке kubernetes/reddit созданы тестовые манифесты приложений
+Раскатан post-deployment.yml 

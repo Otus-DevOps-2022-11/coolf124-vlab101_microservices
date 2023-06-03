@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+  ui:
+    volumes:
+      - ./ui:/source
+    command: sh -c "cp -r /source/* /app/; cd /app ; puma --debug -w 2" 
+    restart: always
+  comment:
+    volumes:
+      - ./comment:/source
+    command: sh -c "cp -r /source/* /app/; cd /app ; puma --debug -w 2" 
+    restart: always
+  post:
+    volumes:
+      - ./post-py:/source
+    command: sh -c "cp -r /source/* /app/; cd /app ; post_app.py"
+    restart: always
