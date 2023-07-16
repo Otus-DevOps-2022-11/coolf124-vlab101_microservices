@@ -9,8 +9,8 @@ metadata:
 spec:
   type: NodePort
   ports:
-#   - nodePort: 32092
-    - protocol: TCP
+    - nodePort: 32092
+      protocol: TCP
       port: 9292
       targetPort: 9292
   selector:
