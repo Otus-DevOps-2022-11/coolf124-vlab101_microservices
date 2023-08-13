@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mongo-gce-pd-storage
+  name: mongo-pvc
 spec:
   storageClassName: nfs-01
   accessModes:
