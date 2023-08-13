@@ -1,7 +1,8 @@
+#added file to pass github actions test
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mongo-pvc
+  name: mongo-gce-pd-storage
 spec:
   storageClassName: nfs-01
   accessModes:
